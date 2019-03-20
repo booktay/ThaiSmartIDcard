@@ -253,7 +253,7 @@ response, sw1, sw2 = cardservice.connection.transmit( apdu )
 print('response: ', response, ' status words: ',"%x %x" % (sw1, sw2))
 
 ### Fetch and write photo
-fphoto = open("photo." + timenow + ".jpeg", "wb")
+fphoto = open("1.photo." + timenow + ".jpeg", "wb")
 for d in PHOTO:
     response, sw1, sw2 = cardservice.connection.transmit( d )
     if sw1 == 0x61:
@@ -266,20 +266,21 @@ for d in PHOTO:
 data = []
 for d in DATA:
     response, sw1, sw2 = cardservice.connection.transmit( d )
-    print(sw1)
+    # print(sw1)
     if sw1 == 0x61:
         GET_RESPONSE = [0X00, 0XC0, 0x00, 0x00 ]
         apdu = GET_RESPONSE + [sw2]
         print('sending ' + toHexString(apdu))
         response, sw1, sw2 = cardservice.connection.transmit( apdu )
-        print('response: ', toHexString(response), 'status words: ', "%x %x" % (sw1, sw2))
+        # print('response: ', toHexString(response), 'status words: ', "%x %x" % (sw1, sw2))
+        print('status words: ', "%x %x" % (sw1, sw2))
         result = ''
         for i in response:
             result = result + tis620encoding[i]
         result = result.strip()
-        print("RESULT ",result.strip().replace('#', ' '))
+        # print("RESULT ",result.strip().replace('#', ' ').replace(' ', ''))
         data.append(result)
-print(data)
+# print(data)
 
-with open("info." + timenow + ".txt", 'w') as wall:
-    json.dump(data, wall)
+with open("2.info." + timenow + ".txt", 'w', encoding='utf-8') as wall:
+    json.dump(data, wall, indent=4, ensure_ascii=False)
