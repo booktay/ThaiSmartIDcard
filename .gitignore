@@ -103,3 +103,5 @@ envreadsmartid/
 
 # mypy
 .mypy_cache/
+
+envsmartid/

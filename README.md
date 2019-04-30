@@ -1,7 +1,24 @@
 # Read Smart ID Card
 
-Download swigs
-`http://www.swig.org/download.html`
+Installation on GNU/Linux or macOS
+----------------------------------
 
-Install Module
-```pip install pyscard```
+Installing on GNU/Linux or macOS from the source distribution
+-------------------------------------------------------------
+0. GCC
+
+1. automake, libtool, pcre
+```
+brew install automake
+brew install libtool
+brew install pcre
+brew install pcsc-lite
+```
+2. swig (http://www.swig.org)
+```
+cd swig
+./configure
+make
+sudo make install
+```
+3. ```pip install pyscard```
