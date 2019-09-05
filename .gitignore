@@ -105,3 +105,4 @@ envreadsmartid/
 .mypy_cache/
 
 envsmartid/
+.DS_Store
