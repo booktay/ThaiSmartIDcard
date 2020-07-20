@@ -1,9 +1,6 @@
-# Read Smart ID Card
+# Thailand Smart ID Card
 
-Installation on GNU/Linux or macOS
-----------------------------------
-
-Installing on GNU/Linux or macOS from the source distribution
+Installing on macOS from the source distribution
 -------------------------------------------------------------
 0. GCC
 
