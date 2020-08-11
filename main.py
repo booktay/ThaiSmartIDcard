@@ -7,12 +7,18 @@ from smartcard.CardType import AnyCardType
 from smartcard.CardRequest import CardRequest
 from smartcard.util import toHexString
 
-cardtype = AnyCardType()
-cardrequest = CardRequest(timeout=1, cardType=cardtype)
-cardservice = cardrequest.waitforcard()
+cardservice = CardRequest(timeout=1, cardType=AnyCardType()).waitforcard()
 cardservice.connection.connect()
 print('CONNECTED TO ' + cardservice.connection.getReader());
 
+def connect():
+    SELECT = [0x00, 0xA4, 0x04, 0x00, 0x08]
+    THAI_ID_CARD = [0xA0, 0x00, 0x00, 0x00, 0x54, 0x48, 0x00, 0x01]
+    apdu = SELECT + THAI_ID_CARD
+    
+    response, sw1, sw2 = cardservice.connection.transmit(apdu)
+    print('response: ', response, ' status words: ', "%x %x" % (sw1, sw2))
+    
 def getResultPath(suffix):
     destination_path = "result-" + datetime.now().strftime("%Y%m%d")
     if not os.path.exists(destination_path):
@@ -210,18 +216,10 @@ def readMemory(d):
     response, sw1, sw2 = cardservice.connection.transmit(d)
     if sw1 == 0x61:
         apdu = [0X00, 0XC0, 0x00, 0x00] + [sw2]
-        print('sending ' + toHexString(apdu))
+        # print('sending ' + toHexString(apdu))
         response, sw1, sw2 = cardservice.connection.transmit(apdu)
         return response, sw1, sw2
     return None, None, None
-
-def connect():
-    SELECT = [0x00, 0xA4, 0x04, 0x00, 0x08]
-    THAI_ID_CARD = [0xA0, 0x00, 0x00, 0x00, 0x54, 0x48, 0x00, 0x01]
-    apdu = SELECT + THAI_ID_CARD
-    
-    response, sw1, sw2 = cardservice.connection.transmit(apdu)
-    print('response: ', response, ' status words: ',"%x %x" % (sw1, sw2))
 
 def getPhoto(nid):
     PHOTO = [
@@ -294,11 +292,20 @@ def getGender():
     gender = generateText(REQ_GENDE)
 
     if gender == "1":
-        return "Male"
+        return {
+            "ENG": "Male",
+            "THAI": "ชาย"
+        }
     elif gender == "2":
-        return "Female"
+        return {
+            "ENG": "Female",
+            "THAI": "หญิง"
+        }
     else:
-        return "Not Specific"
+        return {
+            "ENG": "Not Specific",
+            "THAI": "ไม่ระบุ"
+        }
 
 def getBirthDate():
     REQ_DOB = [0x80, 0xb0, 0x00, 0xD9, 0x02, 0x00, 0x08]
@@ -315,28 +322,35 @@ def getCardIssuedAndExpired():
     date = generateText(REQ_ISSUE_EXPIRE)
     return date[0:4] + "/" + date[4:6] + "/" + date[6:8], date[8:12] + "/" + date[12:14] + "/" + date[14:16]
 
-def getData():
+def getCardIssuer():
+    REQ_CARD_ISSUER = [0x80, 0xb0, 0x00, 0xF6, 0x02, 0x00, 0x64]
+    issuer = generateText(REQ_CARD_ISSUER)
+    return issuer
+
+def getData(nid):
     issue_date, expire_date = getCardIssuedAndExpired()
 
     data = {
-        "ID": getID(),
+        "ID": nid,
         "THAI_NAME": getThaiName(),
         "ENG_NAME": getEngName(),
         "GENDER": getGender(),
         "BIRTH_DATE": getBirthDate(),
         "ADDRESS": getAddress(),
-        "CARD_ISSUE": issue_date,
-        "CARD_EXPIRED": expire_date
+        "CARD": {
+            "ISSUER": getCardIssuer(),
+            "ISSUED_DATE": issue_date,
+            "EXPIRED_DATE": expire_date
+        }
     }
 
-    data_path = getResultPath(data["ID"] + ".info.txt")
+    data_path = getResultPath(nid + ".info.json")
     with open(data_path, 'w', encoding='utf-8') as wall:
         json.dump(data, wall, indent=4, ensure_ascii=False)
 
-    return data["ID"]
-
 if __name__ == "__main__":
     connect()
-    
-    nid = getData()
-    getPhoto(nid)
+    nid = getID()
+    getData(nid)
+    # getPhoto(nid)
+    print("[Completed] Write ID : " + nid)
