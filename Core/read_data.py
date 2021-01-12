@@ -254,8 +254,8 @@ def getPhoto(nid):
 
 def generateText(d):
     response, _, _ = readMemory(d)
+    result = ''
     if response :
-        result = ''
         for i in response: result = result + convertRegisterToTis620(i)
         result = ' '.join(result.replace("#", " ").split())
     return result
