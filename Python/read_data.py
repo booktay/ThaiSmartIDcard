@@ -352,5 +352,5 @@ if __name__ == "__main__":
     connect()
     nid = getID()
     getData(nid)
-    # getPhoto(nid)
+    getPhoto(nid)
     print("[Completed] Write ID : " + nid)

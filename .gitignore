@@ -111,3 +111,6 @@ swig-4.0.2/
 result-*/
 
 .vscode/
+
+node_modules/
+Driver/
