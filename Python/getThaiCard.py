@@ -1,8 +1,6 @@
 import json
 import os
-
 from datetime import datetime
-
 from ThaiNIDSmartcard import ThaiNIDSmartcard
 
 class getThaiCard:
